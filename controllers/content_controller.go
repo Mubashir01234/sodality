@@ -78,6 +78,35 @@ var GetContentByID = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Reque
 	middlewares.SuccessArrRespond(content, rw)
 })
 
+// GetAllContentOfUser -> Get content of specific user
+// var GetAllContentOfUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+// 	params := mux.Vars(r)
+// 	var challenges []*models.Challenge
+
+// 	collection := client.Database("challenge").Collection("challenges")
+// 	cursor, err := collection.Find(context.TODO(), bson.D{primitive.E{Key: "coordinator", Value: params["username"]}})
+// 	if err != nil {
+// 		middlewares.ServerErrResponse(err.Error(), rw)
+// 		return
+// 	}
+
+// 	for cursor.Next(context.TODO()) {
+// 		var challenge models.Challenge
+// 		err := cursor.Decode(&challenge)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		challenges = append(challenges, &challenge)
+// 	}
+
+// 	if err := cursor.Err(); err != nil {
+// 		middlewares.ServerErrResponse(err.Error(), rw)
+// 		return
+// 	}
+
+// 	middlewares.SuccessChallengeArrRespond(challenges, rw)
+// })
+
 // // ListChallenge -> List all the challenges
 // var ListChallenge = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 // 	var challenges []*models.Challenge

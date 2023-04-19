@@ -18,6 +18,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var client = db.Dbconnect()
@@ -94,6 +95,27 @@ var LoginUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 	middlewares.SuccessResponse(string(token), rw)
 })
 
+// GetUserByID -> Get user details with user id
+var GetUserByID = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var user models.User
+
+	userID, _ := primitive.ObjectIDFromHex(params["id"])
+
+	collection := client.Database("sodality").Collection("users")
+	err := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "_id", Value: userID}}).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			middlewares.ErrorResponse("user id does not exist", rw)
+			return
+		}
+		middlewares.ServerErrResponse(err.Error(), rw)
+		return
+	}
+	user.Password = ""
+	middlewares.SuccessArrRespond(user, rw)
+})
+
 // GetMe -> Get user details from Authorization token
 var GetMe = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 	props, _ := r.Context().Value("props").(jwt.MapClaims)
@@ -102,22 +124,6 @@ var GetMe = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 	err := collection.FindOne(r.Context(), bson.D{primitive.E{Key: "username", Value: props["username"]}}).Decode(&user)
 	if err != nil {
 		middlewares.AuthorizationResponse("Malformed token", rw)
-		return
-	}
-
-	user.Password = ""
-	middlewares.SuccessRespond(user, rw)
-})
-
-// GetUser -> Get user details from username
-var GetUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	var user models.User
-
-	collection := client.Database("challenge").Collection("users")
-	err := collection.FindOne(r.Context(), bson.D{primitive.E{Key: "username", Value: params["username"]}}).Decode(&user)
-	if err != nil {
-		middlewares.ErrorResponse("User doesn't exist", rw)
 		return
 	}
 

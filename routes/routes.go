@@ -18,9 +18,10 @@ func Routes() *mux.Router {
 	user := api.PathPrefix("/user").Subrouter()
 	user.HandleFunc("/register", controllers.RegisterUser).Methods("POST")
 	user.HandleFunc("/login", controllers.LoginUser).Methods("POST")
+	user.HandleFunc("/{id}", controllers.GetUserByID).Methods("GET")
+
 	// user.HandleFunc("/me", middlewares.IsAuthorized(controllers.GetMe)).Methods("GET")
 	// user.HandleFunc("/me", middlewares.IsAuthorized(controllers.UpdateUser)).Methods("PUT")
-	// user.HandleFunc("/{username}", controllers.GetUser).Methods("GET")
 
 	// Content API routes
 
