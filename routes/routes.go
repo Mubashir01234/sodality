@@ -26,6 +26,7 @@ func Routes() *mux.Router {
 
 	content := api.PathPrefix("/content").Subrouter()
 	content.HandleFunc("/post", middlewares.IsAuthorized(controllers.PostContent)).Methods("POST")
+	content.HandleFunc("/{id}", middlewares.IsAuthorized(controllers.GetContentByID)).Methods("GET")
 
 	// challenge.HandleFunc("/", middlewares.IsAuthorized(controllers.CreateChallenge)).Methods("POST")
 	// challenge.HandleFunc("/user/{username}", controllers.GetChallenges).Methods("GET")

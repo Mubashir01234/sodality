@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -45,8 +44,7 @@ var PostContent = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request)
 	}
 
 	content.UserID = userID.Hex()
-	content.CreatedAt = time.Now()
-	content.UpdatedAt = time.Now()
+	content.CreatedAt = time.Now().UTC()
 
 	contentCollection := client.Database("sodality").Collection("content")
 	result, err := contentCollection.InsertOne(context.TODO(), content)
@@ -59,62 +57,83 @@ var PostContent = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request)
 	middlewares.SuccessResponse(`inserted at `+strings.Replace(string(res), `"`, ``, 2), rw)
 })
 
-// ListChallenge -> List all the challenges
-var ListChallenge = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-	var challenges []*models.Challenge
-	collection := client.Database("challenge").Collection("challenges")
-	cursor, err := collection.Find(context.TODO(), bson.D{})
-	if err != nil {
-		middlewares.ServerErrResponse(err.Error(), rw)
-		return
-	}
-
-	for cursor.Next(context.TODO()) {
-		var challenge models.Challenge
-		err := cursor.Decode(&challenge)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		challenges = append(challenges, &challenge)
-	}
-
-	if err := cursor.Err(); err != nil {
-		middlewares.ServerErrResponse(err.Error(), rw)
-		return
-	}
-
-	middlewares.SuccessChallengeArrRespond(challenges, rw)
-})
-
-// GetChallengs -> Get challenges for specific user
-var GetChallenges = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+// GetContentByID -> Get content of user by content id
+var GetContentByID = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	var challenges []*models.Challenge
+	var content models.Content
 
-	collection := client.Database("challenge").Collection("challenges")
-	cursor, err := collection.Find(context.TODO(), bson.D{primitive.E{Key: "coordinator", Value: params["username"]}})
+	contentID, _ := primitive.ObjectIDFromHex(params["id"])
+
+	collection := client.Database("sodality").Collection("content")
+	err := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "_id", Value: contentID}}).Decode(&content)
 	if err != nil {
-		middlewares.ServerErrResponse(err.Error(), rw)
-		return
-	}
-
-	for cursor.Next(context.TODO()) {
-		var challenge models.Challenge
-		err := cursor.Decode(&challenge)
-		if err != nil {
-			log.Fatal(err)
+		if err == mongo.ErrNoDocuments {
+			middlewares.ErrorResponse("content id does not exist", rw)
+			return
 		}
-		challenges = append(challenges, &challenge)
-	}
-
-	if err := cursor.Err(); err != nil {
 		middlewares.ServerErrResponse(err.Error(), rw)
 		return
 	}
 
-	middlewares.SuccessChallengeArrRespond(challenges, rw)
+	middlewares.SuccessArrRespond(content, rw)
 })
+
+// // ListChallenge -> List all the challenges
+// var ListChallenge = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+// 	var challenges []*models.Challenge
+// 	collection := client.Database("challenge").Collection("challenges")
+// 	cursor, err := collection.Find(context.TODO(), bson.D{})
+// 	if err != nil {
+// 		middlewares.ServerErrResponse(err.Error(), rw)
+// 		return
+// 	}
+
+// 	for cursor.Next(context.TODO()) {
+// 		var challenge models.Challenge
+// 		err := cursor.Decode(&challenge)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+
+// 		challenges = append(challenges, &challenge)
+// 	}
+
+// 	if err := cursor.Err(); err != nil {
+// 		middlewares.ServerErrResponse(err.Error(), rw)
+// 		return
+// 	}
+
+// 	middlewares.SuccessChallengeArrRespond(challenges, rw)
+// })
+
+// // GetChallengs -> Get challenges for specific user
+// var GetChallenges = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+// 	params := mux.Vars(r)
+// 	var challenges []*models.Challenge
+
+// 	collection := client.Database("challenge").Collection("challenges")
+// 	cursor, err := collection.Find(context.TODO(), bson.D{primitive.E{Key: "coordinator", Value: params["username"]}})
+// 	if err != nil {
+// 		middlewares.ServerErrResponse(err.Error(), rw)
+// 		return
+// 	}
+
+// 	for cursor.Next(context.TODO()) {
+// 		var challenge models.Challenge
+// 		err := cursor.Decode(&challenge)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		challenges = append(challenges, &challenge)
+// 	}
+
+// 	if err := cursor.Err(); err != nil {
+// 		middlewares.ServerErrResponse(err.Error(), rw)
+// 		return
+// 	}
+
+// 	middlewares.SuccessChallengeArrRespond(challenges, rw)
+// })
 
 // CreateChallenge -> Create a challenge
 var CreateChallenge = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {

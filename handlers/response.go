@@ -3,8 +3,6 @@ package middlewares
 import (
 	"encoding/json"
 	"net/http"
-
-	"sodality/models"
 )
 
 // AuthorizationResponse -> response authorize
@@ -22,35 +20,15 @@ func AuthorizationResponse(msg string, writer http.ResponseWriter) {
 }
 
 // SuccessArrRespond -> response formatter
-func SuccessArrRespond(fields []*models.Person, writer http.ResponseWriter) {
+func SuccessArrRespond(fields interface{}, writer http.ResponseWriter) {
 	// var fields["status"] := "success"
 	_, err := json.Marshal(fields)
 	type data struct {
-		People     []*models.Person `json:"data"`
-		Statuscode int              `json:"status"`
-		Message    string           `json:"msg"`
+		Data       interface{} `json:"data"`
+		Statuscode int         `json:"status"`
+		Message    string      `json:"msg"`
 	}
-	temp := &data{People: fields, Statuscode: 200, Message: "success"}
-	if err != nil {
-		ServerErrResponse(err.Error(), writer)
-	}
-
-	//Send header, status code and output to writer
-	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode(temp)
-}
-
-// SuccessArrRespond -> response formatter
-func SuccessChallengeArrRespond(fields []*models.Challenge, writer http.ResponseWriter) {
-	// var fields["status"] := "success"
-	_, err := json.Marshal(fields)
-	type data struct {
-		Challenges []*models.Challenge `json:"data"`
-		Statuscode int                 `json:"status"`
-		Message    string              `json:"msg"`
-	}
-	temp := &data{Challenges: fields, Statuscode: 200, Message: "success"}
+	temp := &data{Data: fields, Statuscode: 200, Message: "success"}
 	if err != nil {
 		ServerErrResponse(err.Error(), writer)
 	}
