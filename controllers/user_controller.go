@@ -59,7 +59,7 @@ var RegisterUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request
 		return
 	}
 	res, _ := json.Marshal(result.InsertedID)
-	middlewares.SuccessResponse(`Inserted at `+strings.Replace(string(res), `"`, ``, 2), rw)
+	middlewares.SuccessResponse(`inserted at `+strings.Replace(string(res), `"`, ``, 2), rw)
 })
 
 // LoginUser -> Let the user login with identity and password

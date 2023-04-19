@@ -15,26 +15,48 @@ import (
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // PostContent -> Create a creator content
 var PostContent = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-	var challenge models.Challenge
-	err := json.NewDecoder(r.Body).Decode(&challenge)
+	props, _ := r.Context().Value("props").(jwt.MapClaims)
+
+	var content models.Content
+	err := json.NewDecoder(r.Body).Decode(&content)
 	if err != nil {
 		middlewares.ServerErrResponse(err.Error(), rw)
 		return
 	}
-	challenge.CreatedAt = time.Now()
-	challenge.UpdatedAt = time.Now()
-	collection := client.Database("challenge").Collection("challenges")
-	result, err := collection.InsertOne(context.TODO(), challenge)
+
+	var existingUser models.User
+	userID, _ := primitive.ObjectIDFromHex(props["user_id"].(string))
+
+	userCollection := client.Database("sodality").Collection("users")
+	err = userCollection.FindOne(r.Context(), bson.D{primitive.E{Key: "_id", Value: userID}}).Decode(&existingUser)
+	if err != nil && err != mongo.ErrNoDocuments {
+		middlewares.ServerErrResponse(err.Error(), rw)
+		return
+	}
+
+	if existingUser.ID != userID || err == mongo.ErrNoDocuments {
+		middlewares.ErrorResponse("user does not exists", rw)
+		return
+	}
+
+	content.UserID = userID.Hex()
+	content.CreatedAt = time.Now()
+	content.UpdatedAt = time.Now()
+
+	contentCollection := client.Database("sodality").Collection("content")
+	result, err := contentCollection.InsertOne(context.TODO(), content)
 	if err != nil {
 		middlewares.ServerErrResponse(err.Error(), rw)
 		return
 	}
+
 	res, _ := json.Marshal(result.InsertedID)
-	middlewares.SuccessResponse(`Inserted at `+strings.Replace(string(res), `"`, ``, 2), rw)
+	middlewares.SuccessResponse(`inserted at `+strings.Replace(string(res), `"`, ``, 2), rw)
 })
 
 // ListChallenge -> List all the challenges

@@ -17,6 +17,7 @@ type Claims struct {
 	Username string `json:"username"`
 	Dash     string `json:"dash"`
 	Email    string `json:"email"`
+	UserID   string `json:"user_id"`
 	// Role     int    `json:"role"`
 	jwt.StandardClaims
 }
@@ -53,6 +54,7 @@ func GenerateJWT(user models.User) (string, error) {
 		Username: user.Username,
 		Dash:     user.Dash,
 		Email:    user.Email,
+		UserID:   user.ID.Hex(),
 		// Role:     user.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(2 * time.Hour).Unix(),
