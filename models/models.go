@@ -20,10 +20,10 @@ type User struct {
 	Email           string             `json:"email,omitempty" bson:"email,omitempty"`
 	Password        string             `json:"password,omitempty" bson:"password,omitempty"`
 	SubscriberCount int64              `json:"subscriberCount,omitempty" bson:"subscriberCount,omitempty"`
-	Role            int                `json:"role,omitempty" bson:"role,omitempty"`
-	Bio             string             `json:"bio,omitempty" bson:"bio,omitempty"`
-	Avatar          string             `json:"avatar,omitempty" bson:"avatar,omitempty"`
-	Dash            string             `json:"dash,omitempty" bson:"dash,omitempty"`
+	// Role            int                `json:"role,omitempty" bson:"role,omitempty"`
+	Bio    string `json:"bio,omitempty" bson:"bio,omitempty"`
+	Avatar string `json:"avatar,omitempty" bson:"avatar,omitempty"`
+	Dash   string `json:"dash,omitempty" bson:"dash,omitempty"`
 }
 
 type ChallengeStatus string
