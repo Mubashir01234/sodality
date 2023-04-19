@@ -22,7 +22,7 @@ import (
 
 var client = db.Dbconnect()
 
-// RegisterUser -> Register User with Menmonic and username
+// RegisterUser -> Register User with email, username and dash
 var RegisterUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 	var user models.User
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -30,16 +30,21 @@ var RegisterUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request
 		middlewares.ServerErrResponse(err.Error(), rw)
 		return
 	}
-	collection := client.Database("challenge").Collection("users")
+	collection := client.Database("sodality").Collection("users")
 	var existingUser models.User
 	err = collection.FindOne(r.Context(), bson.D{primitive.E{Key: "username", Value: user.Username}}).Decode(&existingUser)
 	if err == nil {
-		middlewares.ErrorResponse("Username is already taken.", rw)
+		middlewares.ErrorResponse("username is already taken", rw)
 		return
 	}
-	err = collection.FindOne(r.Context(), bson.D{primitive.E{Key: "identity", Value: user.Identity}}).Decode(&existingUser)
+	err = collection.FindOne(r.Context(), bson.D{primitive.E{Key: "email", Value: user.Email}}).Decode(&existingUser)
 	if err == nil {
-		middlewares.ErrorResponse("Identity is already in use.", rw)
+		middlewares.ErrorResponse("email is already exists", rw)
+		return
+	}
+	err = collection.FindOne(r.Context(), bson.D{primitive.E{Key: "dash", Value: user.Dash}}).Decode(&existingUser)
+	if err == nil {
+		middlewares.ErrorResponse("dash is already exists", rw)
 		return
 	}
 	passwordHash, err := middlewares.HashPassword(user.Password)
@@ -65,21 +70,25 @@ var LoginUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		middlewares.ServerErrResponse(err.Error(), rw)
 		return
 	}
-	collection := client.Database("challenge").Collection("users")
+	collection := client.Database("sodality").Collection("users")
 	var existingUser models.User
-	err = collection.FindOne(r.Context(), bson.D{primitive.E{Key: "username", Value: user.Username}}).Decode(&existingUser)
+	if len(user.Username) > 0 {
+		err = collection.FindOne(r.Context(), bson.D{primitive.E{Key: "username", Value: user.Username}}).Decode(&existingUser)
+	} else {
+		err = collection.FindOne(r.Context(), bson.D{primitive.E{Key: "email", Value: user.Email}}).Decode(&existingUser)
+	}
 	if err != nil {
-		middlewares.ErrorResponse("User doesn't exist", rw)
+		middlewares.ErrorResponse("user doesn't exist", rw)
 		return
 	}
 	isPasswordMatch := middlewares.CheckPasswordHash(user.Password, existingUser.Password)
 	if !isPasswordMatch {
-		middlewares.ErrorResponse("Password doesn't match", rw)
+		middlewares.ErrorResponse("password doesn't match", rw)
 		return
 	}
-	token, err := middlewares.GenerateJWT(user.Username, existingUser.Identity)
+	token, err := middlewares.GenerateJWT(existingUser)
 	if err != nil {
-		middlewares.ErrorResponse("Failed to generate JWT", rw)
+		middlewares.ErrorResponse("failed to generate token", rw)
 		return
 	}
 	middlewares.SuccessResponse(string(token), rw)
@@ -155,12 +164,12 @@ var UpdateUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	token, err := middlewares.GenerateJWT(newUser.Username, user.Identity)
-	if err != nil {
-		middlewares.ErrorResponse("Failed to generate JWT", rw)
-		return
-	}
-	middlewares.SuccessResponse(string(token), rw)
+	// token, err := middlewares.GenerateJWT(newUser.Username, user.Identity)
+	// if err != nil {
+	// 	middlewares.ErrorResponse("Failed to generate JWT", rw)
+	// 	return
+	// }
+	// middlewares.SuccessResponse(string(token), rw)
 })
 
 // CreatePersonEndpoint -> create person

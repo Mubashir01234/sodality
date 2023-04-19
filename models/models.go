@@ -15,13 +15,15 @@ type Person struct {
 
 // User Model
 type User struct {
-	ID       primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	Username string             `json:"username,omitempty" bson:"username,omitempty"`
-	Role     string             `json:"role,omitempty" bson:"role,omitempty"`
-	Bio      string             `json:"bio,omitempty" bson:"bio,omitempty"`
-	Avatar   string             `json:"avatar,omitempty" bson:"avatar,omitempty"`
-	Identity string             `json:"identity,omitempty" bson:"identity,omitempty"`
-	Password string             `json:"password,omitempty" bson:"password,omitempty"`
+	ID              primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Username        string             `json:"username,omitempty" bson:"username,omitempty"`
+	Email           string             `json:"email,omitempty" bson:"email,omitempty"`
+	Password        string             `json:"password,omitempty" bson:"password,omitempty"`
+	SubscriberCount int64              `json:"subscriberCount,omitempty" bson:"subscriberCount,omitempty"`
+	Role            int                `json:"role,omitempty" bson:"role,omitempty"`
+	Bio             string             `json:"bio,omitempty" bson:"bio,omitempty"`
+	Avatar          string             `json:"avatar,omitempty" bson:"avatar,omitempty"`
+	Dash            string             `json:"dash,omitempty" bson:"dash,omitempty"`
 }
 
 type ChallengeStatus string

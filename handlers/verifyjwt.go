@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"sodality/models"
 	"strings"
 	"time"
 
@@ -14,7 +15,9 @@ var JWT_SECRET = []byte(DotEnvVariable("JWT_SECRET"))
 
 type Claims struct {
 	Username string `json:"username"`
-	Identity string `json:"identity"`
+	Dash     string `json:"dash"`
+	Email    string `json:"email"`
+	Role     int    `json:"role"`
 	jwt.StandardClaims
 }
 
@@ -45,10 +48,12 @@ func IsAuthorized(next http.Handler) http.HandlerFunc {
 }
 
 // GenerateJWT -> generate jwt
-func GenerateJWT(username, identity string) (string, error) {
+func GenerateJWT(user models.User) (string, error) {
 	claims := &Claims{
-		Username: username,
-		Identity: identity,
+		Username: user.Username,
+		Dash:     user.Dash,
+		Email:    user.Email,
+		Role:     user.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(2 * time.Hour).Unix(),
 		},
