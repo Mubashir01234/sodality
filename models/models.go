@@ -26,6 +26,19 @@ type User struct {
 	Dash   string `json:"dash,omitempty" bson:"dash,omitempty"`
 }
 
+// Content Model
+type Content struct {
+	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	ContentID string             `json:"content_id,omitempty" bson:"content_id,omitempty"`
+	UserID    string             `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	Title     string             `json:"title,omitempty" bson:"title,omitempty"`
+	Body      string             `json:"body,omitempty" bson:"body,omitempty"`
+	Type      string             `json:"type,omitempty" bson:"type,omitempty"`
+	Fund      string             `json:"fund,omitempty" bson:"fund,omitempty"`
+	CreatedAt time.Time          `json:"created_at,omitempty" bson:"created_at,omitempty"`
+	UpdatedAt time.Time          `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
+}
+
 type ChallengeStatus string
 
 const (

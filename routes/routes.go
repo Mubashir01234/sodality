@@ -2,6 +2,7 @@ package routes
 
 import (
 	"sodality/controllers"
+	middlewares "sodality/handlers"
 
 	"github.com/gorilla/mux"
 )
@@ -21,10 +22,11 @@ func Routes() *mux.Router {
 	// user.HandleFunc("/me", middlewares.IsAuthorized(controllers.UpdateUser)).Methods("PUT")
 	// user.HandleFunc("/{username}", controllers.GetUser).Methods("GET")
 
-	// Challenge API routes
+	// Content API routes
 
-	// challenge := api.PathPrefix("/challenge").Subrouter()
-	// challenge.HandleFunc("/", middlewares.IsAuthorized(controllers.ListChallenge)).Methods("GET")
+	content := api.PathPrefix("/content").Subrouter()
+	content.HandleFunc("/", middlewares.IsAuthorized(controllers.PostContent)).Methods("POST")
+
 	// challenge.HandleFunc("/", middlewares.IsAuthorized(controllers.CreateChallenge)).Methods("POST")
 	// challenge.HandleFunc("/user/{username}", controllers.GetChallenges).Methods("GET")
 	// challenge.HandleFunc("/{id}", middlewares.IsAuthorized(controllers.GetChallenge)).Methods("GET")

@@ -17,6 +17,26 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// PostContent -> Create a creator content
+var PostContent = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+	var challenge models.Challenge
+	err := json.NewDecoder(r.Body).Decode(&challenge)
+	if err != nil {
+		middlewares.ServerErrResponse(err.Error(), rw)
+		return
+	}
+	challenge.CreatedAt = time.Now()
+	challenge.UpdatedAt = time.Now()
+	collection := client.Database("challenge").Collection("challenges")
+	result, err := collection.InsertOne(context.TODO(), challenge)
+	if err != nil {
+		middlewares.ServerErrResponse(err.Error(), rw)
+		return
+	}
+	res, _ := json.Marshal(result.InsertedID)
+	middlewares.SuccessResponse(`Inserted at `+strings.Replace(string(res), `"`, ``, 2), rw)
+})
+
 // ListChallenge -> List all the challenges
 var ListChallenge = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 	var challenges []*models.Challenge
