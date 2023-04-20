@@ -26,6 +26,13 @@ type User struct {
 	Dash   string `json:"dash,omitempty" bson:"dash,omitempty"`
 }
 
+type Followers struct {
+	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	CreatorID string             `json:"creator_id,omitempty" bson:"creator_id"`
+	UserID    string             `json:"user_id,omitempty" bson:"user_id"`
+	CreatedAt time.Time          `json:"created_at,omitempty" bson:"created_at,omitempty"`
+}
+
 // Content Model
 type Content struct {
 	ID           primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`

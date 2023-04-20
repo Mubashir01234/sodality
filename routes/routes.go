@@ -34,6 +34,10 @@ func Routes() *mux.Router {
 	creator.HandleFunc("/content/{category_name}/", controllers.GetCreatorDirectoryByDirectoryName).Methods("GET")
 	creator.HandleFunc("/all/content", middlewares.IsAuthorized(controllers.GetOwnContent)).Methods("GET")
 
+	// Followers endpoint
+	creator.HandleFunc("/follow/{creator_id}", middlewares.IsAuthorized(controllers.FollowCreator)).Methods("POST")
+	creator.HandleFunc("/unfollow/{creator_id}", middlewares.IsAuthorized(controllers.UnfollowCreator)).Methods("DELETE")
+
 	// challenge.HandleFunc("/", middlewares.IsAuthorized(controllers.CreateChallenge)).Methods("POST")
 	// challenge.HandleFunc("/user/{username}", controllers.GetChallenges).Methods("GET")
 	// challenge.HandleFunc("/{id}", middlewares.IsAuthorized(controllers.GetChallenge)).Methods("GET")
