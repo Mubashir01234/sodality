@@ -31,6 +31,7 @@ type Content struct {
 	ID           primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	ContentID    string             `json:"content_id,omitempty" bson:"content_id,omitempty"`
 	UserID       string             `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	CategoryName string             `json:"category_name,omitempty" bson:"category_name"`
 	Title        string             `json:"title,omitempty" bson:"title,omitempty"`
 	Body         string             `json:"body,omitempty" bson:"body,omitempty"`
 	Type         string             `json:"type,omitempty" bson:"type,omitempty"`

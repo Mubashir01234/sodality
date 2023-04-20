@@ -28,6 +28,10 @@ func Routes() *mux.Router {
 	content.HandleFunc("/post", middlewares.IsAuthorized(controllers.PostContent)).Methods("POST")
 	content.HandleFunc("/{id}", controllers.GetContentByID).Methods("GET")
 
+	// Creator content
+	creator := api.PathPrefix("/creator").Subrouter()
+	creator.HandleFunc("/content/{category_name}", controllers.GetCreatorDirectoryByDirectoryName).Methods("GET")
+
 	// challenge.HandleFunc("/", middlewares.IsAuthorized(controllers.CreateChallenge)).Methods("POST")
 	// challenge.HandleFunc("/user/{username}", controllers.GetChallenges).Methods("GET")
 	// challenge.HandleFunc("/{id}", middlewares.IsAuthorized(controllers.GetChallenge)).Methods("GET")
