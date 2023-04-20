@@ -84,3 +84,21 @@ var UnfollowCreator = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Requ
 
 	middlewares.SuccessResponse(`successfully unfollow creator`+follow.CreatorID, rw)
 })
+
+var GetCreatorFollowers = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	filter := bson.M{"creator_id": params["user_id"]}
+
+	var followersCount models.FollowersCount
+	collection := client.Database("sodality").Collection("followers")
+	count, err := collection.CountDocuments(context.TODO(), filter)
+	if err != nil && err != mongo.ErrNoDocuments {
+		middlewares.ServerErrResponse(err.Error(), rw)
+		return
+	}
+
+	followersCount.Count = count
+
+	middlewares.SuccessRespond(followersCount, rw)
+})

@@ -37,6 +37,7 @@ func Routes() *mux.Router {
 	// Followers endpoint
 	creator.HandleFunc("/follow/{creator_id}", middlewares.IsAuthorized(controllers.FollowCreator)).Methods("POST")
 	creator.HandleFunc("/unfollow/{creator_id}", middlewares.IsAuthorized(controllers.UnfollowCreator)).Methods("DELETE")
+	creator.HandleFunc("/{user_id}/followers/", controllers.GetCreatorFollowers).Methods("GET")
 
 	// challenge.HandleFunc("/", middlewares.IsAuthorized(controllers.CreateChallenge)).Methods("POST")
 	// challenge.HandleFunc("/user/{username}", controllers.GetChallenges).Methods("GET")

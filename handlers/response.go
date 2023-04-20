@@ -43,11 +43,11 @@ func SuccessArrRespond(fields interface{}, writer http.ResponseWriter) {
 func SuccessRespond(fields interface{}, writer http.ResponseWriter) {
 	_, err := json.Marshal(fields)
 	type data struct {
-		Person     interface{} `json:"data"`
+		Data       interface{} `json:"data"`
 		Statuscode int         `json:"status"`
 		Message    string      `json:"msg"`
 	}
-	temp := &data{Person: fields, Statuscode: 200, Message: "success"}
+	temp := &data{Data: fields, Statuscode: 200, Message: "success"}
 	if err != nil {
 		ServerErrResponse(err.Error(), writer)
 	}
