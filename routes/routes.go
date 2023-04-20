@@ -27,6 +27,7 @@ func Routes() *mux.Router {
 	content := api.PathPrefix("/content").Subrouter()
 	content.HandleFunc("/post", middlewares.IsAuthorized(controllers.PostContent)).Methods("POST")
 	content.HandleFunc("/{id}", controllers.GetContentByID).Methods("GET")
+	content.HandleFunc("/all/", middlewares.IsAuthorized(controllers.GetOwnContent)).Methods("GET")
 
 	// Creator content
 	creator := api.PathPrefix("/creator").Subrouter()

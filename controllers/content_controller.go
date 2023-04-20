@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -76,6 +77,33 @@ var GetContentByID = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Reque
 	}
 
 	middlewares.SuccessArrRespond(content, rw)
+})
+
+var GetOwnContent = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+	props, _ := r.Context().Value("props").(jwt.MapClaims)
+	var allContent []*models.Content
+
+	collection := client.Database("sodality").Collection("content")
+	cursor, err := collection.Find(context.TODO(), bson.D{primitive.E{Key: "user_id", Value: props["user_id"].(string)}})
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			middlewares.ErrorResponse("content does not exist", rw)
+			return
+		}
+		middlewares.ServerErrResponse(err.Error(), rw)
+		return
+	}
+	for cursor.Next(context.TODO()) {
+		var content models.Content
+		err := cursor.Decode(&content)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		allContent = append(allContent, &content)
+	}
+
+	middlewares.SuccessArrRespond(allContent, rw)
 })
 
 // GetAllContentOfUser -> Get content of specific user
