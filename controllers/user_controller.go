@@ -116,6 +116,27 @@ var GetUserByID = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request)
 	middlewares.SuccessArrRespond(user, rw)
 })
 
+// GetProfile -> Get own profile
+var GetProfile = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+	props, _ := r.Context().Value("props").(jwt.MapClaims)
+	var user models.User
+
+	userID, _ := primitive.ObjectIDFromHex(props["user_id"].(string))
+	collection := client.Database("sodality").Collection("users")
+	err := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "_id", Value: userID}}).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			middlewares.ErrorResponse("user id does not exist", rw)
+			return
+		}
+		middlewares.ServerErrResponse(err.Error(), rw)
+		return
+	}
+	user.Password = ""
+
+	middlewares.SuccessArrRespond(user, rw)
+})
+
 // GetMe -> Get user details from Authorization token
 var GetMe = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 	props, _ := r.Context().Value("props").(jwt.MapClaims)

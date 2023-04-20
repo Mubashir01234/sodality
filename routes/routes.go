@@ -19,15 +19,15 @@ func Routes() *mux.Router {
 	user.HandleFunc("/register", controllers.RegisterUser).Methods("POST")
 	user.HandleFunc("/login", controllers.LoginUser).Methods("POST")
 	user.HandleFunc("/{id}", controllers.GetUserByID).Methods("GET")
+	user.HandleFunc("/profile/", middlewares.IsAuthorized(controllers.GetProfile)).Methods("GET")
 
-	// user.HandleFunc("/me", middlewares.IsAuthorized(controllers.GetMe)).Methods("GET")
 	// user.HandleFunc("/me", middlewares.IsAuthorized(controllers.UpdateUser)).Methods("PUT")
 
 	// Content API routes
 
 	content := api.PathPrefix("/content").Subrouter()
 	content.HandleFunc("/post", middlewares.IsAuthorized(controllers.PostContent)).Methods("POST")
-	content.HandleFunc("/{id}", middlewares.IsAuthorized(controllers.GetContentByID)).Methods("GET")
+	content.HandleFunc("/{id}", controllers.GetContentByID).Methods("GET")
 
 	// challenge.HandleFunc("/", middlewares.IsAuthorized(controllers.CreateChallenge)).Methods("POST")
 	// challenge.HandleFunc("/user/{username}", controllers.GetChallenges).Methods("GET")
