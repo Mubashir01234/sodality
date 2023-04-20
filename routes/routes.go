@@ -14,7 +14,6 @@ func Routes() *mux.Router {
 	api := router.PathPrefix("/api/v1").Subrouter()
 
 	// User API routes
-
 	user := api.PathPrefix("/user").Subrouter()
 	user.HandleFunc("/register", controllers.RegisterUser).Methods("POST")
 	user.HandleFunc("/login", controllers.LoginUser).Methods("POST")
@@ -27,6 +26,7 @@ func Routes() *mux.Router {
 	content := api.PathPrefix("/content").Subrouter()
 	content.HandleFunc("/post", middlewares.IsAuthorized(controllers.PostContent)).Methods("POST")
 	content.HandleFunc("/all", controllers.GetAllCreatorsContent).Methods("GET")
+	content.HandleFunc("/{search}", controllers.SearchContentByTitle).Methods("GET")
 
 	// Creator content
 	creator := api.PathPrefix("/creator").Subrouter()

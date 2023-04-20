@@ -110,6 +110,35 @@ var GetOwnContent = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Reques
 	middlewares.SuccessArrRespond(allContent, rw)
 })
 
+var SearchContentByTitle = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var allContent []*models.Content
+
+	filter := bson.M{"title": bson.M{"$regex": params["search"], "$options": "im"}}
+
+	collection := client.Database("sodality").Collection("content")
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			middlewares.ErrorResponse("contents does not exist", rw)
+			return
+		}
+		middlewares.ServerErrResponse(err.Error(), rw)
+		return
+	}
+	for cursor.Next(context.TODO()) {
+		var content models.Content
+		err := cursor.Decode(&content)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		allContent = append(allContent, &content)
+	}
+
+	middlewares.SuccessArrRespond(allContent, rw)
+})
+
 // GetAllContentOfUser -> Get content of specific user
 // var GetAllContentOfUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 // 	params := mux.Vars(r)
