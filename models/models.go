@@ -41,6 +41,21 @@ type Content struct {
 	UpdatedAt    time.Time          `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 }
 
+type GetAllContentWithCreatorResp struct {
+	ID           primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	ContentID    string             `json:"content_id,omitempty" bson:"content_id,omitempty"`
+	UserID       string             `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	User         User               `json:"user_detail,omitempty" bson:"user_detail,omitempty"`
+	CategoryName string             `json:"category_name,omitempty" bson:"category_name"`
+	Title        string             `json:"title,omitempty" bson:"title,omitempty"`
+	Body         string             `json:"body,omitempty" bson:"body,omitempty"`
+	Type         string             `json:"type,omitempty" bson:"type,omitempty"`
+	Fund         float64            `json:"fund,omitempty" bson:"fund,omitempty"`
+	CurrencyType string             `json:"currency_type,omitempty" bson:"currency_type"`
+	CreatedAt    time.Time          `json:"created_at,omitempty" bson:"created_at,omitempty"`
+	UpdatedAt    time.Time          `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
+}
+
 type ChallengeStatus string
 
 const (

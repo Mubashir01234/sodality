@@ -16,6 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // PostContent -> Create a creator content
@@ -83,8 +84,11 @@ var GetOwnContent = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Reques
 	props, _ := r.Context().Value("props").(jwt.MapClaims)
 	var allContent []*models.Content
 
+	// opts := options.Find().SetSort(bson.D{{Key: "created_at", Value: -1}})
+	opts := options.Find().SetSort(bson.D{primitive.E{Key: "fund", Value: -1}})
+
 	collection := client.Database("sodality").Collection("content")
-	cursor, err := collection.Find(context.TODO(), bson.D{primitive.E{Key: "user_id", Value: props["user_id"].(string)}})
+	cursor, err := collection.Find(context.TODO(), bson.D{primitive.E{Key: "user_id", Value: props["user_id"].(string)}}, opts)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			middlewares.ErrorResponse("content does not exist", rw)
