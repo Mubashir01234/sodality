@@ -19,7 +19,7 @@ type User struct {
 	Username        string             `json:"username,omitempty" bson:"username,omitempty"`
 	Email           string             `json:"email,omitempty" bson:"email,omitempty"`
 	Password        string             `json:"password,omitempty" bson:"password,omitempty"`
-	SubscriberCount int64              `json:"subscriberCount,omitempty" bson:"subscriberCount,omitempty"`
+	SubscriberCount int64              `json:"subscriber_count,omitempty" bson:"subscriber_count,omitempty"`
 	// Role            int                `json:"role,omitempty" bson:"role,omitempty"`
 	Bio    string `json:"bio,omitempty" bson:"bio,omitempty"`
 	Avatar string `json:"avatar,omitempty" bson:"avatar,omitempty"`
@@ -28,15 +28,16 @@ type User struct {
 
 // Content Model
 type Content struct {
-	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	ContentID string             `json:"content_id,omitempty" bson:"content_id,omitempty"`
-	UserID    string             `json:"user_id,omitempty" bson:"user_id,omitempty"`
-	Title     string             `json:"title,omitempty" bson:"title,omitempty"`
-	Body      string             `json:"body,omitempty" bson:"body,omitempty"`
-	Type      string             `json:"type,omitempty" bson:"type,omitempty"`
-	Fund      string             `json:"fund,omitempty" bson:"fund,omitempty"`
-	CreatedAt time.Time          `json:"created_at,omitempty" bson:"created_at,omitempty"`
-	UpdatedAt time.Time          `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
+	ID           primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	ContentID    string             `json:"content_id,omitempty" bson:"content_id,omitempty"`
+	UserID       string             `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	Title        string             `json:"title,omitempty" bson:"title,omitempty"`
+	Body         string             `json:"body,omitempty" bson:"body,omitempty"`
+	Type         string             `json:"type,omitempty" bson:"type,omitempty"`
+	Fund         float64            `json:"fund,omitempty" bson:"fund,omitempty"`
+	CurrencyType string             `json:"currency_type,omitempty" bson:"currency_type"`
+	CreatedAt    time.Time          `json:"created_at,omitempty" bson:"created_at,omitempty"`
+	UpdatedAt    time.Time          `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 }
 
 type ChallengeStatus string

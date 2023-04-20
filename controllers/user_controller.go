@@ -137,30 +137,17 @@ var GetProfile = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) 
 	middlewares.SuccessArrRespond(user, rw)
 })
 
-// GetMe -> Get user details from Authorization token
-var GetMe = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-	props, _ := r.Context().Value("props").(jwt.MapClaims)
-	var user models.User
-	collection := client.Database("challenge").Collection("users")
-	err := collection.FindOne(r.Context(), bson.D{primitive.E{Key: "username", Value: props["username"]}}).Decode(&user)
-	if err != nil {
-		middlewares.AuthorizationResponse("Malformed token", rw)
-		return
-	}
-
-	user.Password = ""
-	middlewares.SuccessRespond(user, rw)
-})
-
 // UpdateUser -> Update user details from username
 var UpdateUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 	props, _ := r.Context().Value("props").(jwt.MapClaims)
 	var user models.User
 
-	collection := client.Database("challenge").Collection("users")
-	err := collection.FindOne(r.Context(), bson.D{primitive.E{Key: "username", Value: props["username"]}}).Decode(&user)
+	userID, _ := primitive.ObjectIDFromHex(props["user_id"].(string))
+
+	collection := client.Database("sodality").Collection("users")
+	err := collection.FindOne(r.Context(), bson.D{primitive.E{Key: "_id", Value: userID}}).Decode(&user)
 	if err != nil {
-		middlewares.AuthorizationResponse("Malformed token", rw)
+		middlewares.AuthorizationResponse("malformed token", rw)
 		return
 	}
 
@@ -170,34 +157,70 @@ var UpdateUser = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) 
 		middlewares.ServerErrResponse(err.Error(), rw)
 		return
 	}
+	if len(newUser.Username) <= 0 {
+		newUser.Username = user.Username
+	}
+	if len(newUser.Email) <= 0 {
+		newUser.Email = user.Email
+	}
+	if newUser.SubscriberCount <= 0 {
+		newUser.SubscriberCount = user.SubscriberCount
+	}
+	if len(newUser.Avatar) <= 0 {
+		newUser.Avatar = user.Avatar
+	}
+	if len(newUser.Dash) <= 0 {
+		newUser.Dash = user.Dash
+	}
+	if len(newUser.Bio) <= 0 {
+		newUser.Bio = user.Bio
+	}
 
 	res, err := collection.UpdateOne(r.Context(), bson.D{primitive.E{Key: "_id", Value: user.ID}}, bson.D{
 		primitive.E{
 			Key: "$set",
 			Value: bson.D{
 				primitive.E{Key: "username", Value: newUser.Username},
+				primitive.E{Key: "email", Value: newUser.Email},
+				primitive.E{Key: "subscriber_count", Value: newUser.SubscriberCount},
 				primitive.E{Key: "avatar", Value: newUser.Avatar},
+				primitive.E{Key: "dash", Value: newUser.Dash},
 				primitive.E{Key: "bio", Value: newUser.Bio},
 			},
 		},
 	})
 
 	if err != nil {
-		middlewares.ErrorResponse("Username is already taken.", rw)
+		middlewares.ErrorResponse("username is already taken.", rw)
 		return
 	}
 	if res.MatchedCount == 0 {
-		middlewares.ErrorResponse("User doesn't exist", rw)
+		middlewares.ErrorResponse("user doesn't exist", rw)
 		return
 	}
 
-	// token, err := middlewares.GenerateJWT(newUser.Username, user.Identity)
-	// if err != nil {
-	// 	middlewares.ErrorResponse("Failed to generate JWT", rw)
-	// 	return
-	// }
-	// middlewares.SuccessResponse(string(token), rw)
+	token, err := middlewares.GenerateJWT(newUser)
+	if err != nil {
+		middlewares.ErrorResponse("Failed to generate JWT", rw)
+		return
+	}
+	middlewares.SuccessResponse(string(token), rw)
 })
+
+// // GetMe -> Get user details from Authorization token
+// var GetMe = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+// 	props, _ := r.Context().Value("props").(jwt.MapClaims)
+// 	var user models.User
+// 	collection := client.Database("challenge").Collection("users")
+// 	err := collection.FindOne(r.Context(), bson.D{primitive.E{Key: "username", Value: props["username"]}}).Decode(&user)
+// 	if err != nil {
+// 		middlewares.AuthorizationResponse("Malformed token", rw)
+// 		return
+// 	}
+
+// 	user.Password = ""
+// 	middlewares.SuccessRespond(user, rw)
+// })
 
 // CreatePersonEndpoint -> create person
 var CreatePersonEndpoint = http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
