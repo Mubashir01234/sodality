@@ -10,6 +10,7 @@ import (
 // Routes -> define endpoints
 func Routes() *mux.Router {
 	router := mux.NewRouter()
+	// api := router.PathPrefix("/api/v1").Subrouter()
 
 	api := router.PathPrefix("/api/v1").Subrouter()
 
